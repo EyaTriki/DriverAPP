@@ -1,11 +1,12 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import {create} from 'zustand';
+import {persist, createJSONStorage} from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface User {
   id: string;
   email: string;
   name: string;
+  avatar?: string;
 }
 
 interface AuthState {
@@ -33,28 +34,31 @@ export const useAuthStore = create<AuthStore>()(
       isAuthenticated: false,
 
       // Actions
-      setLoading: (loading: boolean) => set({ isLoading: loading }),
+      setLoading: (loading: boolean) => set({isLoading: loading}),
 
       checkAuthStatus: async () => {
         try {
-          set({ isLoading: true });
+          set({isLoading: true});
           // La persistance est gérée automatiquement par Zustand
           // On vérifie juste si l'utilisateur existe dans le store
-          const { user } = get();
+          const {user} = get();
           if (user) {
-            set({ isAuthenticated: true });
+            set({isAuthenticated: true});
           }
         } catch (error) {
-          console.error('Erreur lors de la vérification du statut d\'authentification:', error);
+          console.error(
+            "Erreur lors de la vérification du statut d'authentification:",
+            error,
+          );
         } finally {
-          set({ isLoading: false });
+          set({isLoading: false});
         }
       },
 
       login: async (email: string, password: string): Promise<boolean> => {
         try {
-          set({ isLoading: true });
-          
+          set({isLoading: true});
+
           // Simulation d'une API de connexion
           // Remplacez ceci par votre vraie logique d'authentification
           if (email === 'driver@gmail.com' && password === 'password') {
@@ -63,66 +67,66 @@ export const useAuthStore = create<AuthStore>()(
               email: email,
               name: 'Driver',
             };
-            
-            set({ 
-              user: userData, 
+
+            set({
+              user: userData,
               isAuthenticated: true,
-              isLoading: false 
+              isLoading: false,
             });
             return true;
           }
-          
-          set({ isLoading: false });
+
+          set({isLoading: false});
           return false;
         } catch (error) {
           console.error('Erreur lors de la connexion:', error);
-          set({ isLoading: false });
+          set({isLoading: false});
           return false;
         }
       },
 
       logout: async (): Promise<void> => {
         try {
-          set({ isLoading: true });
-          set({ 
-            user: null, 
+          set({isLoading: true});
+          set({
+            user: null,
             isAuthenticated: false,
-            isLoading: false 
+            isLoading: false,
           });
         } catch (error) {
           console.error('Erreur lors de la déconnexion:', error);
-          set({ isLoading: false });
+          set({isLoading: false});
         }
       },
 
       demoLogin: async (): Promise<void> => {
         try {
-          set({ isLoading: true });
-          
+          set({isLoading: true});
+
           const demoUser: User = {
             id: 'demo',
             email: 'demo@example.com',
             name: 'Utilisateur Démo',
           };
-          
-          set({ 
-            user: demoUser, 
+
+          set({
+            user: demoUser,
             isAuthenticated: true,
-            isLoading: false 
+            isLoading: false,
           });
         } catch (error) {
           console.error('Erreur lors de la connexion en mode démo:', error);
-          set({ isLoading: false });
+          set({isLoading: false});
         }
       },
     }),
     {
       name: 'auth-storage', // nom de la clé dans AsyncStorage
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({ 
+      partialize: state => ({
         user: state.user,
-        isAuthenticated: state.isAuthenticated 
+        isAuthenticated: state.isAuthenticated,
       }), // On ne persiste que l'utilisateur et l'état d'authentification
-    }
-  )
+    },
+  ),
 );

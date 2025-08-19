@@ -41,20 +41,24 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         <View className="flex-1">
             <StatusBar barStyle="light-content" backgroundColor={COLORS.primaryGreen} />
 
-            {/* Background with two sections */}
-            <View className="flex-1">
-                {/* Green section (top) */}
-                <View className="flex-1" style={{ backgroundColor: COLORS.primaryGreen }} />
-                {/* White section (bottom) */}
-                <View className="flex-1 bg-white" />
+            <View className="absolute inset-0">
+                {/* Top green area (fixed height) */}
+                <View style={{ height: 400, backgroundColor: COLORS.primaryGreen }} />
+                {/* Bottom white area fills the rest */}
+                <View style={{ flex: 1, backgroundColor: 'white' }} />
             </View>
 
+
+
+
             <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
                 className="absolute inset-0"
             >
                 <ScrollView
                     className="flex-1"
+                    keyboardShouldPersistTaps="handled"
+                    keyboardDismissMode="on-drag"
                     contentContainerStyle={{
                         flexGrow: 1,
                         justifyContent: 'flex-start',

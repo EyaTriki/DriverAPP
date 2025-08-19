@@ -35,6 +35,7 @@ const InputField: React.FC<InputFieldProps> = ({
     inputStyle = 'default',
 }) => {
     const [showPassword, setShowPassword] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
 
     const getKeyboardType = () => {
         switch (type) {
@@ -75,8 +76,6 @@ const InputField: React.FC<InputFieldProps> = ({
     };
 
     const getInputStyleClasses = () => {
-        const isFilled = value.length > 0;
-
         if (error) {
             return {
                 borderColor: COLORS.error,
@@ -84,7 +83,7 @@ const InputField: React.FC<InputFieldProps> = ({
             };
         }
 
-        if (isFilled) {
+        if (isFocused) {
             return {
                 borderColor: COLORS.primaryGreen,
                 backgroundColor: COLORS.primaryGreenOpacity18
@@ -92,7 +91,7 @@ const InputField: React.FC<InputFieldProps> = ({
         }
 
         return {
-            borderColor: COLORS.primaryGreen,
+            borderColor: '#E5E7EB',
             backgroundColor: 'white'
         };
     };
@@ -136,6 +135,8 @@ const InputField: React.FC<InputFieldProps> = ({
                     multiline={multiline}
                     numberOfLines={multiline ? numberOfLines : 1}
                     textAlignVertical={multiline ? 'top' : 'center'}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
                 />
 
                 {renderRightIcon()}

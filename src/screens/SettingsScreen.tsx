@@ -1,134 +1,146 @@
+// screens/SettingsScreen.tsx
 import React from 'react';
-import { View, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, ScrollView, Image, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuthStore } from '../stores/authStore';
-import Button from '../components/Button';
+import { User, Calendar, Wallet, LogoutCurve, ArrowRight2, Camera } from 'iconsax-react-native';
+
+
+const softShadow = Platform.select({
+    ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.07,
+        shadowRadius: 16,
+    },
+    android: { elevation: 4 },
+});
+
+type IconType = React.ComponentType<any>;
+
+const SettingsTile = ({
+    title,
+    icon: Icon,
+    onPress,
+    danger = false,
+}: {
+    title: string;
+    icon: IconType;
+    onPress?: () => void;
+    danger?: boolean;
+}) => (
+    <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={onPress}
+        className="bg-white rounded-2xl px-4 py-4 mb-4"
+        style={softShadow as any}
+    >
+        <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center">
+                <View className="w-11 h-11 rounded-xl border border-gray-200 bg-white items-center justify-center mr-3">
+                    <Icon size={24} color={danger ? '#E53935' : '#111827'} variant="Outline" />
+                </View>
+                <Text
+                    className={`text-base font-semibold ${danger ? 'text-red-500' : 'text-gray-900'
+                        }`}
+                >
+                    {title}
+                </Text>
+            </View>
+
+            <ArrowRight2 size={22} color={danger ? '#EF4444' : '#9CA3AF'} variant="Outline" />
+        </View>
+    </TouchableOpacity>
+);
 
 const SettingsScreen: React.FC = () => {
     const { user, logout } = useAuthStore();
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
 
     const handleLogout = async () => {
-        Alert.alert(
-            'Déconnexion',
-            'Êtes-vous sûr de vouloir vous déconnecter ?',
-            [
-                {
-                    text: 'Annuler',
-                    style: 'cancel',
+        Alert.alert('Déconnexion', 'Êtes-vous sûr de vouloir vous déconnecter ?', [
+            { text: 'Annuler', style: 'cancel' },
+            {
+                text: 'Déconnexion',
+                style: 'destructive',
+                onPress: async () => {
+                    try {
+                        await logout();
+                        navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+                    } catch (e) {
+                        console.error(e);
+                        Alert.alert('Erreur', 'Une erreur est survenue lors de la déconnexion.');
+                    }
                 },
-                {
-                    text: 'Déconnexion',
-                    style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            await logout();
-                            // Navigation vers l'écran de connexion après déconnexion
-                            navigation.reset({
-                                index: 0,
-                                routes: [{ name: 'Login' as never }],
-                            });
-                        } catch (error) {
-                            console.error('Erreur lors de la déconnexion:', error);
-                            Alert.alert('Erreur', 'Une erreur est survenue lors de la déconnexion.');
-                        }
-                    },
-                },
-            ]
-        );
+            },
+        ]);
     };
 
     return (
-        <ScrollView className="flex-1 bg-white" contentContainerStyle={{ paddingBottom: 100 }}>
-            <View className="p-5">
-                {/* Header */}
-                <View className="items-center mt-12 mb-10">
-                    <Text className="text-2xl font-bold text-gray-900">Paramètres</Text>
-                </View>
+        <ScrollView
+            className="flex-1 bg-[#F7F7FA]"
+            contentContainerStyle={{ paddingBottom: 140, paddingTop: 100 }}
+        >
+            {/* Profile card */}
+            <View className="px-5 pt-6">
+                <View className="bg-white rounded-3xl px-5 pt-12 pb-6 items-center" style={softShadow as any}>
+                    {/* Avatar stack */}
+                    <View className="absolute -top-10">
+                        {/* outer grey ring */}
+                        <View className="w-24 h-24 rounded-full border-[3px] border-[#E6E6E6] items-center justify-center">
+                            {/* inner white ring */}
+                            <View className="w-22 h-22 rounded-full border-[3px] border-white overflow-hidden bg-gray-200">
+                                {user?.avatar ? (
+                                    <Image source={{ uri: user.avatar }} className="w-full h-full" resizeMode="cover" />
+                                ) : (
+                                    <Image
+                                        source={{ uri: 'https://i.pravatar.cc/150?img=5' }}
+                                        className="w-full h-full"
+                                        resizeMode="cover"
+                                    />
+                                )}
+                            </View>
+                        </View>
 
-                {/* User Info Card */}
-                <View className="bg-gray-50 rounded-2xl p-6 mb-8">
-                    <View className="flex-row justify-between items-center py-3 border-b border-gray-200">
-                        <Text className="text-gray-600 font-semibold text-base">Nom:</Text>
-                        <Text className="text-gray-900 text-base">{user?.name || 'Driver'}</Text>
+                        {/* camera badge */}
+                        <View className="absolute -right-1 -bottom-1 w-7 h-7 rounded-full bg-[#8BC34A] items-center justify-center border-2 border-white">
+                            <Camera size={14} color="#fff" variant="Bold" />
+                        </View>
                     </View>
-                    <View className="flex-row justify-between items-center py-3">
-                        <Text className="text-gray-600 font-semibold text-base">Email:</Text>
-                        <Text className="text-gray-900 text-base">{user?.email || 'driver@gmail.com'}</Text>
-                    </View>
-                </View>
 
-                {/* Settings Options */}
-                <View className="bg-gray-50 rounded-2xl p-6 mb-8">
-                    <TouchableOpacity className="flex-row justify-between items-center py-3 border-b border-gray-200">
-                        <Text className="text-gray-600 font-semibold text-base">Notifications</Text>
-                        <Text className="text-gray-400 text-sm">Activées</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity className="flex-row justify-between items-center py-3 border-b border-gray-200">
-                        <Text className="text-gray-600 font-semibold text-base">Langue</Text>
-                        <Text className="text-gray-400 text-sm">Français</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity className="flex-row justify-between items-center py-3">
-                        <Text className="text-gray-600 font-semibold text-base">Thème</Text>
-                        <Text className="text-gray-400 text-sm">Clair</Text>
-                    </TouchableOpacity>
+                    <Text className="mt-4 text-xl font-extrabold text-gray-900">
+                        {user?.name || 'John Doe'}
+                    </Text>
+                    <Text className="mt-1 text-sm text-gray-500">
+                        {user?.email || 'Johndoe20@gmail.com'}
+                    </Text>
                 </View>
+            </View>
 
-                {/* Additional Settings */}
-                <View className="bg-gray-50 rounded-2xl p-6 mb-8">
-                    <TouchableOpacity className="flex-row justify-between items-center py-3 border-b border-gray-200">
-                        <Text className="text-gray-600 font-semibold text-base">Sécurité</Text>
-                        <Text className="text-gray-400 text-sm">Configurer</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity className="flex-row justify-between items-center py-3 border-b border-gray-200">
-                        <Text className="text-gray-600 font-semibold text-base">Confidentialité</Text>
-                        <Text className="text-gray-400 text-sm">Gérer</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity className="flex-row justify-between items-center py-3">
-                        <Text className="text-gray-600 font-semibold text-base">Aide</Text>
-                        <Text className="text-gray-400 text-sm">Support</Text>
-                    </TouchableOpacity>
-                </View>
+            {/* Tiles */}
+            <View className="px-5 mt-6">
+                <SettingsTile
+                    title="Profile"
+                    icon={User}
+                    onPress={() => navigation.navigate('Profile')}
+                />
+                <SettingsTile
+                    title="Request Day Off"
+                    icon={Calendar}
+                    onPress={() => navigation.navigate('RequestDayOff')}
+                />
+                <SettingsTile
+                    title="Payroll"
+                    icon={Wallet}
+                    onPress={() => navigation.navigate('Payroll')}
+                />
 
-                {/* Account Settings */}
-                <View className="bg-gray-50 rounded-2xl p-6 mb-8">
-                    <TouchableOpacity className="flex-row justify-between items-center py-3 border-b border-gray-200">
-                        <Text className="text-gray-600 font-semibold text-base">Profil</Text>
-                        <Text className="text-gray-400 text-sm">Modifier</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity className="flex-row justify-between items-center py-3 border-b border-gray-200">
-                        <Text className="text-gray-600 font-semibold text-base">Mot de passe</Text>
-                        <Text className="text-gray-400 text-sm">Changer</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity className="flex-row justify-between items-center py-3">
-                        <Text className="text-gray-600 font-semibold text-base">Compte</Text>
-                        <Text className="text-gray-400 text-sm">Gérer</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* App Settings */}
-                <View className="bg-gray-50 rounded-2xl p-6 mb-8">
-                    <TouchableOpacity className="flex-row justify-between items-center py-3 border-b border-gray-200">
-                        <Text className="text-gray-600 font-semibold text-base">Version</Text>
-                        <Text className="text-gray-400 text-sm">1.0.0</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity className="flex-row justify-between items-center py-3 border-b border-gray-200">
-                        <Text className="text-gray-600 font-semibold text-base">Mise à jour</Text>
-                        <Text className="text-gray-400 text-sm">Disponible</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity className="flex-row justify-between items-center py-3">
-                        <Text className="text-gray-600 font-semibold text-base">À propos</Text>
-                        <Text className="text-gray-400 text-sm">Informations</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Logout Button */}
-                <Button
-                    title="Se déconnecter"
+                {/* Logout (danger) */}
+                <SettingsTile
+                    title="Logout"
+                    icon={LogoutCurve}
+                    danger
                     onPress={handleLogout}
-                    variant="danger"
-                    size="large"
-                    className="mb-8"
                 />
             </View>
         </ScrollView>
