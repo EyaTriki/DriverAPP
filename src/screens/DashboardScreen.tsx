@@ -1,60 +1,95 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
+import HeaderGreeting from '../components/HeaderGreeting';
+import ActionPill from '../components/ActionPill';
+import JobCard from '../components/JobCard';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';            // 'my-location'
 
-const DashboardScreen = () => (
-  <ScrollView className="flex-1 bg-white" contentContainerStyle={{ paddingBottom: 100 }}>
-    <View className="p-6">
-      <Text className="text-2xl font-bold text-gray-800 mb-6">Dashboard</Text>
 
-      {/* Section 1 */}
-      <View className="bg-gray-50 rounded-xl p-4 mb-4">
-        <Text className="text-lg font-semibold text-gray-800 mb-2">Section 1</Text>
-        <Text className="text-gray-600">Contenu de la première section du dashboard.</Text>
+const DashboardScreen: React.FC = () => {
+  return (
+    <ScrollView className="flex-1 bg-backgroundScreen" contentContainerStyle={{ paddingBottom: 120 }}>
+      <View className="p-6">
+        {/* Greeting header */}
+        <HeaderGreeting
+          name="John Doe"
+          subtitle="Hello, Welcome 👋"
+          onBellPress={() => { }}
+        />
+
+        {/* Title */}
+        <Text className="text-xl font-poppins-bold mt-6">Job Lists</Text>
+
+
+        <View className="mt-4 gap-3 flex-col items-center">
+          {/* Pick Up — my-location icon */}
+          <ActionPill
+            label="Pick Up"
+            size="lg"
+            rightIcon={<MaterialIcons name="my-location" size={20} color="#fff" />}
+            bubbleClassName="bg-white/20 rounded-full"
+            className="w-64 self-center"     // ~256px wide and centered
+            onPress={() => { }}
+          />
+
+          {/* Start Today Shift — square arrow right */}
+          <ActionPill
+            label="Start Today Shift"
+            size="lg"
+            rightIcon={
+              <View className="bg-white/20 rounded-lg p-1">
+                <MaterialIcons
+                  name="arrow-forward"
+                  size={22}
+                  color="#fff"
+                />
+              </View>
+            }
+            bubbleClassName=""
+            className="w-72 self-start " // positioned slightly to the left of center
+            onPress={() => { }}
+          />
+        </View>
+
+
+        {/* --- TO DO / Horizontal cards --- */}
+        <View className="mt-8">
+          {/* header row */}
+          <View className="flex-row items-center justify-between mb-2 px-1 mt-8">
+            <Text className="text-base font-poppins-bold text-gray-900">TO DO</Text>
+            <View className="w-8 h-8 rounded-full bg-gray-100 items-center justify-center">
+              <Text className="text-gray-700"></Text>
+            </View>
+          </View>
+
+          {/* curved container feel (soft top border) */}
+          <View className="rounded-3xl bg-white border border-containerGray pt-6 pb-4">
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 16 }}
+            >
+              <JobCard
+                title="Anytime"
+                address="221B Baker Street London"
+                status="ended"
+              />
+              <JobCard
+                title="Warehouse"
+                address="Wayne Manor"
+                status="inprogress"
+              />
+              <JobCard
+                title="Morning"
+                address="42 Wallaby Way"
+                status="new"
+              />
+            </ScrollView>
+          </View>
+        </View>
       </View>
-
-      {/* Section 2 */}
-      <View className="bg-gray-50 rounded-xl p-4 mb-4">
-        <Text className="text-lg font-semibold text-gray-800 mb-2">Section 2</Text>
-        <Text className="text-gray-600">Contenu de la deuxième section du dashboard.</Text>
-      </View>
-
-      {/* Section 3 */}
-      <View className="bg-gray-50 rounded-xl p-4 mb-4">
-        <Text className="text-lg font-semibold text-gray-800 mb-2">Section 3</Text>
-        <Text className="text-gray-600">Contenu de la troisième section du dashboard.</Text>
-      </View>
-
-      {/* Section 4 */}
-      <View className="bg-gray-50 rounded-xl p-4 mb-4">
-        <Text className="text-lg font-semibold text-gray-800 mb-2">Section 4</Text>
-        <Text className="text-gray-600">Contenu de la quatrième section du dashboard.</Text>
-      </View>
-
-      {/* Section 5 */}
-      <View className="bg-gray-50 rounded-xl p-4 mb-4">
-        <Text className="text-lg font-semibold text-gray-800 mb-2">Section 5</Text>
-        <Text className="text-gray-600">Contenu de la cinquième section du dashboard.</Text>
-      </View>
-
-      {/* Section 6 */}
-      <View className="bg-gray-50 rounded-xl p-4 mb-4">
-        <Text className="text-lg font-semibold text-gray-800 mb-2">Section 6</Text>
-        <Text className="text-gray-600">Contenu de la sixième section du dashboard.</Text>
-      </View>
-
-      {/* Section 7 */}
-      <View className="bg-gray-50 rounded-xl p-4 mb-4">
-        <Text className="text-lg font-semibold text-gray-800 mb-2">Section 7</Text>
-        <Text className="text-gray-600">Contenu de la septième section du dashboard.</Text>
-      </View>
-
-      {/* Section 8 */}
-      <View className="bg-gray-50 rounded-xl p-4 mb-4">
-        <Text className="text-lg font-semibold text-gray-800 mb-2">Section 8</Text>
-        <Text className="text-gray-600">Contenu de la huitième section du dashboard.</Text>
-      </View>
-    </View>
-  </ScrollView>
-);
+    </ScrollView>
+  );
+};
 
 export default DashboardScreen;

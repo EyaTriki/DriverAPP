@@ -35,25 +35,25 @@ const TabNavigator = () => {
       case 'Dashboard':
         return (
           <IconItem focused={focused}>
-            <Ionicons name="menu" size={28} color={c} />
+            <Ionicons name="menu" size={30} color={c} />
           </IconItem>
         );
       case 'Collab':
         return (
           <IconItem focused={focused}>
-            <MaterialCommunityIcons name="truck-outline" size={28} color={c} />
+            <MaterialCommunityIcons name="truck-outline" size={30} color={c} />
           </IconItem>
         );
       case 'Resaux':
         return (
           <IconItem focused={focused}>
-            <MaterialCommunityIcons name="home-variant-outline" size={28} color={c} />
+            <MaterialCommunityIcons name="home-variant-outline" size={30} color={c} />
           </IconItem>
         );
       case 'Settings':
         return (
           <IconItem focused={focused}>
-            <Ionicons name="settings-outline" size={28} color={c} />
+            <Ionicons name="settings-outline" size={30} color={c} />
           </IconItem>
         );
       default:
