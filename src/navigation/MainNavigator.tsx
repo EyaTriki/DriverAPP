@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import SplashScreen from '../screens/SplashScreen';
 import LoginScreen from '../screens/LoginScreen';
 import TabNavigator from './TabNavigator';
+import ChatScreen from '../screens/ChatScreen';
 import { useAuthStore } from '../stores/authStore';
 import { ActivityIndicator, View } from 'react-native';
 
@@ -52,6 +53,14 @@ const MainNavigator = () => {
                     component={TabNavigator}
                     options={{
                         gestureEnabled: false,
+                    }}
+                />
+                <Stack.Screen
+                    name="Chat"
+                    component={ChatScreen}
+                    options={{
+                        headerShown: false,
+                        gestureEnabled: true,
                     }}
                 />
             </Stack.Navigator>

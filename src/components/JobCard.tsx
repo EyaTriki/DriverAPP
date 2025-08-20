@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { COLORS } from '../constants/colors';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import { COLORS } from '../constants/colors';
 
 type Props = {
     title: string;
@@ -23,45 +23,69 @@ const statusStyle = (s?: Props['status']) => {
     }
 };
 
+const shadow = {
+    elevation: 0,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+};
+
 const JobCard: React.FC<Props> = ({ title, address, status = 'ended', onPress, imageUri }) => {
     const s = statusStyle(status);
+
     return (
-        <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={onPress}
-            className="w-64 mr-4 rounded-2xl bg-white border border-containerGray overflow-hidden"
-        >
-            <Image
-                source={
-                    imageUri
-                        ? { uri: imageUri }
-                        : { uri: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&q=80' }
-                }
-                className="w-full h-28"
-            />
+        <TouchableOpacity activeOpacity={0.9} onPress={onPress} className="mr-4 ">
+            <View
+                className="w-73 rounded-2xl bg-white border border-containerGray px-4 py-4 flex-row items-center "
+                style={shadow}
+            >
+                {/* Left thumbnail */}
+                <Image
+                    source={{
+                        uri: imageUri
+                            ? imageUri
+                            : 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=160&q=80',
+                    }}
+                    style={{ width: 80, height: 64, borderRadius: 12 }}  // ← explicit size
+                    resizeMode="cover"
+                    onError={(e) => console.warn('Image load error:', e.nativeEvent.error)}
+                />
 
-            <View className="p-3">
-                <View className="flex-row items-center justify-between">
-                    <AntDesign name="clockcircleo" size={14} color={COLORS.primaryGreen} />
 
-                    <Text className="font-poppins-bold text-base text-gray-900">{title}</Text>
-                    <Ionicons name="ellipsis-horizontal" size={18} color="#687076" />
-                </View>
+                {/* Text block */}
+                <View className="flex-1 ml-4">
+                    {/* Title row */}
+                    <View className="flex-row items-center">
+                        <AntDesign name="clockcircleo" size={16} color={COLORS.primaryGreen} />
+                        <Text className="ml-2 font-poppins-medium text-[16px] text-gray-900" numberOfLines={1}>
+                            {title}
+                        </Text>
+                    </View>
 
-                <View className="flex-row items-center mt-1">
-                    <Ionicons name="location-outline" size={14} color="#8E9BAA" />
-                    <Text className="ml-1 text-gray text-sm" numberOfLines={1}>
-                        {address}
-                    </Text>
-                </View>
+                    {/* Address row */}
+                    <View className="mt-1 flex-row items-center">
+                        <Ionicons name="location-outline" size={17} color="#8E9BAA" className='self-end' />
+                        <Text className="ml-1 font-poppins-medium text-[12px] text-gray-800" numberOfLines={1}>
+                            {address}
+                        </Text>
+                    </View>
 
-                <View className="mt-2 self-start px-2.5 py-1 rounded-lg flex-row items-center gap-1
-                          bg-gray-100">
-                    {/* status pill */}
-                    <View className={`px-2 py-0.5 rounded ${s.badgeBg}`}>
-                        <Text className={`text-xs ${s.badgeText}`}>{s.label}</Text>
+                    {/* Status pill */}
+                    <View className="mt-2 self-start">
+                        <View className={`px-2.5 py-1 rounded-lg ${s.badgeBg}`}>
+                            <Text className={`font-poppins-medium text-[9px]  ${s.badgeText}`}>{s.label}</Text>
+                        </View>
                     </View>
                 </View>
+
+                {/* Right chevron button */}
+                <TouchableOpacity
+                    className="ml-3 mt-10 w-9 h-9 rounded-full border border-containerGray bg-white items-center justify-center self-end"
+                    activeOpacity={0.8}
+                >
+                    <Ionicons name="chevron-forward" size={18} color="#687076" />
+                </TouchableOpacity>
             </View>
         </TouchableOpacity>
     );

@@ -1,6 +1,6 @@
 // TabNavigator.tsx
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { CurvedBottomBar } from 'react-native-curved-bottom-bar';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -8,8 +8,8 @@ import { COLORS } from '../constants';
 
 // Screens
 import DashboardScreen from '../screens/DashboardScreen';
-import IcrmScreen from '../screens/IcrmScreen';
-import ResauxScreen from '../screens/ResauxScreen';
+import ChatScreen from '../screens/ChatScreen';
+import StorageScreen from '../screens/StorageScreen';
 import TippingScreen from '../screens/TippingScreen';
 import SettingsNavigator from './SettingsNavigator';
 
@@ -72,24 +72,32 @@ const TabNavigator = () => {
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View className="flex-1 bg-backgroundScreen">
+
       <CurvedBottomBar.Navigator
         screenOptions={{ headerShown: false }}
         type="DOWN"             // courbe qui remonte vers le bouton central
-        height={70}
+        height={60}
+        width={Dimensions.get('window').width}
         circleWidth={70}        // taille du bouton central
         bgColor="#FFFFFF"
         borderTopLeftRight
-        borderColor="#E8EEF5"
+        borderColor="#E0E8F2"
+        borderWidth={1}
+        circlePosition="CENTER"
         style={styles.bar}
         shadowStyle={styles.barShadow}
         initialRouteName="Dashboard"
+        id="TabNavigator"
+        backBehavior="history"
+        screenListeners={{}}
+        defaultScreenOptions={{}}
 
-        renderCircle={({ navigate }) => (
+        renderCircle={({ navigate }: { navigate: any }) => (
           <Animated.View style={styles.centerFAB}>
             <TouchableOpacity
               activeOpacity={0.9}
-              onPress={() => navigate('Icrm')}
+              onPress={() => navigate('Chat')}
               style={styles.centerButton}
             >
               <Ionicons name="chatbubbles-outline" size={32} color="#FFF" />
@@ -106,28 +114,33 @@ const TabNavigator = () => {
         <CurvedBottomBar.Screen name="Collab" position="LEFT" component={TippingScreen} />
 
         {/* CENTER FAB routes to this screen */}
-        <CurvedBottomBar.Screen name="Icrm" position="CIRCLE" component={IcrmScreen} />
+        <CurvedBottomBar.Screen name="Chat" position="CIRCLE" component={ChatScreen} />
 
         {/* RIGHT side */}
-        <CurvedBottomBar.Screen name="Resaux" position="RIGHT" component={ResauxScreen} />
+        <CurvedBottomBar.Screen name="Resaux" position="RIGHT" component={StorageScreen} />
         <CurvedBottomBar.Screen name="Settings" position="RIGHT" component={SettingsNavigator} />
       </CurvedBottomBar.Navigator>
+
     </View >
   );
 };
 
 const styles = StyleSheet.create({
-  bar: {},
+  bar: {
+    marginTop: 2,
+  },
+
   barShadow: {
     // shadowColor: '#000',
     // shadowOffset: { width: 0, height: -6 },
     // shadowOpacity: 0.12,
     // shadowRadius: 12,
     // elevation: 15,
-    shadowColor: 'transparent',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0,
-    shadowRadius: 0,
+    paddingTop: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
     elevation: 0,
   },
   tabTouch: {
@@ -160,9 +173,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     // shadowColor: '#000',
-    // shadowOffset: { width: 0, height: 6 },
-    // shadowOpacity: 0.4,
-    // shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
     // elevation: 12,
   },
   centerButton: {

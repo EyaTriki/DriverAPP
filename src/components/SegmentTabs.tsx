@@ -19,7 +19,7 @@ const SegmentTabs: React.FC<Props> = ({ value, onChange, items }) => {
             className="mt-5"
         // contentContainerStyle={{ paddingRight: 12 }}
         >
-            <View className="flex-row gap-2 justify-center items-center px-2 py-2  ">
+            <View className="flex-row gap-1.5 justify-center items-center px-1 py-1 ">
                 {items.map(it => {
                     const active = value === it.key;
                     return (
@@ -30,7 +30,7 @@ const SegmentTabs: React.FC<Props> = ({ value, onChange, items }) => {
                                 }`}
                         >
                             <Text
-                                className={`${active ? 'text-white' : 'text-gray'} font-poppins-bold text-base`}
+                                className={`${active ? 'text-white' : 'text-gray'} font-poppins-semibold text-base`}
                             >
                                 {it.label}
                             </Text>

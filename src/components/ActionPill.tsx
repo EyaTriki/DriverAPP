@@ -76,7 +76,7 @@ const ActionPill: React.FC<Props> = ({
             activeOpacity={0.9}
             onPress={onPress}
             disabled={disabled}
-            className={`w-full ${s.h} rounded-xl flex-row items-center justify-center gap-2
+            className={`${s.h} rounded-xl flex-row items-center justify-center gap-2
                   ${disabled ? 'bg-gray-300' : 'bg-primaryGreen'} ${className}`}
         >
             {iconPosition === 'left' ? Left : null}

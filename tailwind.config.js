@@ -11,6 +11,7 @@ module.exports = {
     extend: {
       colors: {
         primaryGreen: '#8CC044',
+        borderGreen: '#5C8326',
         primaryGreenOpacity18: 'rgba(140, 192, 68, 0.18)', // 8CC044 avec 18% d'opacité
         white: '#FFFFFF',
         black: '#000000',
@@ -36,9 +37,10 @@ module.exports = {
       },
       fontFamily: {
         poppins: ['Poppins-Regular'],
+        'poppins-regular': ['Poppins-Regular'],
         'poppins-bold': ['Poppins-Bold'],
         'poppins-medium': ['Poppins-Medium'],
-        'poppins-semi': ['Poppins-SemiBold'],
+        'poppins-semibold': ['Poppins-SemiBold'],
       },
     },
   },

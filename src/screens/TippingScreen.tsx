@@ -48,7 +48,7 @@ const TippingScreen: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   return (
     <ScrollView className="flex-1 bg-backgroundScreen" contentContainerStyle={{ paddingBottom: 120 }}>
-      <View className="p-6">
+      <View className="p-5">
         {/* Header */}
         <HeaderGreeting
           name="John Doe"
@@ -57,7 +57,7 @@ const TippingScreen: React.FC = () => {
         />
 
         {/* Title */}
-        <Text className="text-xl font-poppins-bold mt-6">Tipping Request</Text>
+        <Text className="text-xl font-poppins-semibold mt-6">Tipping Request</Text>
 
         {/* Tabs */}
         <SegmentTabs value={tab} onChange={setTab} items={TABS} />
@@ -68,7 +68,7 @@ const TippingScreen: React.FC = () => {
           onPress={() => setShowModal(true)}
           variant="black"
           className="rounded-[10px] px-4  py-[10px] mt-5 self-end"   // 16 / 10 / radius 10
-          textClassName="text-white font-poppins-bold text-base"                            // ✅ white text
+          textClassName="text-white font-poppins-semibold text-base"                            // ✅ white text
         />
 
 

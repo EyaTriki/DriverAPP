@@ -4,7 +4,7 @@ import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 interface ButtonProps {
     title: string;
     onPress: () => void;
-    variant?: 'primary' | 'secondary' | 'danger' | 'outline' | 'black';
+    variant?: 'primary' | 'secondary' | 'danger' | 'outline' | 'black' | 'white' | 'transparent';
     size?: 'small' | 'medium' | 'large';
     disabled?: boolean;
     loading?: boolean;
@@ -28,11 +28,13 @@ const Button: React.FC<ButtonProps> = ({
 }) => {
     const getVariantClasses = () => {
         switch (variant) {
-            case 'primary': return 'bg-green-600';
+            case 'primary': return 'bg-primaryGreen';
             case 'secondary': return 'bg-gray-600';
             case 'danger': return 'bg-red-500';
             case 'outline': return 'border border-green-600 bg-transparent';
             case 'black': return 'bg-black';
+            case 'white': return 'bg-white';
+            case 'transparent': return 'bg-transparent';
             default: return 'bg-black';
         }
     };

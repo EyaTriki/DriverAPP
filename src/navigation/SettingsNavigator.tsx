@@ -1,11 +1,11 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import SettingsScreen from '../screens/SettingsScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import PersonalInformationScreen from '../screens/PersonalInformationScreen';
-import DocumentsScreen from '../screens/DocumentsScreen';
-import PasswordScreen from '../screens/PasswordScreen';
-
+import SettingsScreen from '../screens/settings/SettingsScreen';
+import ProfileScreen from '../screens/settings/ProfileScreen';
+import PersonalInformationScreen from '../screens/settings/PersonalInformationScreen';
+import DocumentsScreen from '../screens/settings/DocumentsScreen';
+import PasswordScreen from '../screens/settings/PasswordScreen';
+import RequestDayOffScreen from '../screens/settings/RequestDayOffScreen';
 const Stack = createStackNavigator();
 
 const SettingsNavigator = () => {
@@ -21,6 +21,7 @@ const SettingsNavigator = () => {
             <Stack.Screen name="PersonalInformation" component={PersonalInformationScreen} />
             <Stack.Screen name="Documents" component={DocumentsScreen} />
             <Stack.Screen name="Password" component={PasswordScreen} />
+            <Stack.Screen name="RequestDayOff" component={RequestDayOffScreen} />
         </Stack.Navigator>
     );
 };

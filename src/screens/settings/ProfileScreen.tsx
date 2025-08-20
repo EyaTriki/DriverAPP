@@ -1,54 +1,14 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { User, DocumentText, Lock, ArrowRight2 } from 'iconsax-react-native';
-
-const softShadow = Platform.select({
-    ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.07,
-        shadowRadius: 16,
-    },
-    android: { elevation: 4 },
-});
-
-type IconType = React.ComponentType<any>;
-
-const ProfileTile = ({
-    title,
-    icon: Icon,
-    onPress,
-}: {
-    title: string;
-    icon: IconType;
-    onPress: () => void;
-}) => (
-    <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={onPress}
-        className="bg-white rounded-2xl px-4 py-4 mb-4"
-        style={softShadow as any}
-    >
-        <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center">
-                <View className="w-11 h-11 rounded-xl border border-gray-200 bg-white items-center justify-center mr-3">
-                    <Icon size={24} color="#111827" variant="Outline" />
-                </View>
-                <Text className="text-base font-semibold text-gray-900">
-                    {title}
-                </Text>
-            </View>
-            <ArrowRight2 size={22} color="#9CA3AF" variant="Outline" />
-        </View>
-    </TouchableOpacity>
-);
+import { BoxComponent } from '../../components';
 
 const ProfileScreen: React.FC = () => {
     const navigation = useNavigation<any>();
 
     return (
-        <View className="flex-1 bg-white">
+        <View className="flex-1 bg-backgroundScreen">
             {/* Header */}
             <View className="pt-12 pb-6 px-5">
                 <View className="flex-row items-center">
@@ -63,21 +23,30 @@ const ProfileScreen: React.FC = () => {
             </View>
 
             {/* Content */}
-            <ScrollView className="flex-1 px-5" contentContainerStyle={{ paddingBottom: 100 }}>
-                <ProfileTile
+            <ScrollView className="flex-1 px-5 mt-6" contentContainerStyle={{ paddingBottom: 100 }}>
+                <BoxComponent
                     title="Personal Informations"
                     icon={User}
                     onPress={() => navigation.navigate('PersonalInformation')}
+                    variant="profile"
+                    textClass="font-poppins-medium text-base"
+
                 />
-                <ProfileTile
+                <BoxComponent
                     title="Documents"
                     icon={DocumentText}
                     onPress={() => navigation.navigate('Documents')}
+                    variant="profile"
+                    textClass="font-poppins-medium text-base"
+
                 />
-                <ProfileTile
+                <BoxComponent
                     title="Password"
                     icon={Lock}
                     onPress={() => navigation.navigate('Password')}
+                    variant="profile"
+                    textClass="font-poppins-medium text-base"
+
                 />
             </ScrollView>
         </View>
