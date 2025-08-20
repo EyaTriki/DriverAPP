@@ -6,6 +6,8 @@ import PersonalInformationScreen from '../screens/settings/PersonalInformationSc
 import DocumentsScreen from '../screens/settings/DocumentsScreen';
 import PasswordScreen from '../screens/settings/PasswordScreen';
 import RequestDayOffScreen from '../screens/settings/RequestDayOffScreen';
+import PayrollScreen from '../screens/PayrollScreen';
+
 const Stack = createStackNavigator();
 
 const SettingsNavigator = () => {
@@ -22,6 +24,7 @@ const SettingsNavigator = () => {
             <Stack.Screen name="Documents" component={DocumentsScreen} />
             <Stack.Screen name="Password" component={PasswordScreen} />
             <Stack.Screen name="RequestDayOff" component={RequestDayOffScreen} />
+            <Stack.Screen name="Payroll" component={PayrollScreen} />
         </Stack.Navigator>
     );
 };

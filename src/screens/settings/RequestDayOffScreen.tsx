@@ -3,7 +3,8 @@ import { View, Text, TouchableOpacity, ScrollView, Alert, TextInput, Modal } fro
 import { useNavigation } from '@react-navigation/native';
 import { ArrowRight2 } from 'iconsax-react-native';
 import { Button } from '../../components';
-import DateTimePicker from '@react-native-community/datetimepicker';
+
+import { Calendar } from 'react-native-calendars';
 import SegmentTabs, { TabKey } from '../../components/SegmentTabs';
 import TippingCard, { TippingItem } from '../../components/TippingCard';
 
@@ -47,30 +48,79 @@ const RequestDayOffScreen: React.FC = () => {
     const [startDate, setStartDate] = useState<Date>(new Date());
     const [endDate, setEndDate] = useState<Date>(new Date());
     const [reason, setReason] = useState('');
-    const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-    const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+
+    const [showCalendarModal, setShowCalendarModal] = useState(false);
+    const [selectedDates, setSelectedDates] = useState<{ [key: string]: any }>({});
+    const [isSelectingEndDate, setIsSelectingEndDate] = useState(false);
 
     const data = useMemo(() => {
         if (tab === 'all') return MOCK_REQUESTS;
         return MOCK_REQUESTS.filter(it => it.status === tab);
     }, [tab]);
 
-    const handleStartDateChange = (event: any, selectedDate?: Date) => {
-        setShowStartDatePicker(false);
-        if (selectedDate) {
+
+
+    const handleCalendarDayPress = (day: any) => {
+        const dateString = day.dateString;
+        const selectedDate = new Date(dateString);
+
+        if (!isSelectingEndDate) {
+            // Selecting start date
             setStartDate(selectedDate);
-            if (endDate < selectedDate) {
+            setSelectedDates({
+                [dateString]: {
+                    selected: true,
+                    startingDay: true,
+                    color: '#8CC044',
+                }
+            });
+            setIsSelectingEndDate(true);
+        } else {
+            // Selecting end date
+            if (selectedDate >= startDate) {
                 setEndDate(selectedDate);
+
+                // Create range marking for all dates in between
+                const newSelectedDates: { [key: string]: any } = {};
+                const currentDate = new Date(startDate);
+                const startDateString = startDate.toISOString().split('T')[0];
+
+                while (currentDate <= selectedDate) {
+                    const currentDateString = currentDate.toISOString().split('T')[0];
+                    const isStartDate = currentDateString === startDateString;
+                    const isEndDate = currentDateString === dateString;
+
+                    newSelectedDates[currentDateString] = {
+                        selected: true,
+                        color: '#8CC044',
+                        startingDay: isStartDate,
+                        endingDay: isEndDate,
+                    };
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                setSelectedDates(newSelectedDates);
+                setShowCalendarModal(false);
+                setIsSelectingEndDate(false);
+            } else {
+                Alert.alert('Invalid Date', 'End date must be after start date');
             }
         }
     };
 
-    const handleEndDateChange = (event: any, selectedDate?: Date) => {
-        setShowEndDatePicker(false);
-        if (selectedDate && selectedDate >= startDate) {
-            setEndDate(selectedDate);
-        } else if (selectedDate) {
-            Alert.alert('Invalid Date', 'End date must be after start date');
+    const openCalendarModal = () => {
+        setShowCalendarModal(true);
+        setIsSelectingEndDate(false);
+        // Initialize with current start date if it exists
+        if (startDate) {
+            const startDateString = startDate.toISOString().split('T')[0];
+            setSelectedDates({
+                [startDateString]: {
+                    selected: true,
+                    startingDay: true,
+                    color: '#8CC044',
+                }
+            });
         }
     };
 
@@ -167,99 +217,153 @@ const RequestDayOffScreen: React.FC = () => {
 
             {/* Request Modal */}
             <Modal
-                animationType="slide"
-                transparent={true}
                 visible={showModal}
+                transparent
+                animationType="fade"
+                statusBarTranslucent
+                presentationStyle="overFullScreen"
                 onRequestClose={() => setShowModal(false)}
             >
-                <View className="flex-1 bg-black bg-opacity-50 justify-center items-center px-4">
-                    <View className="bg-white rounded-2xl w-full max-w-sm">
-                        {/* Header */}
-                        <View className="flex-row items-center justify-between p-6 border-b border-gray-100">
-                            <Text className="text-xl font-poppins-bold text-gray-900">Request a day off</Text>
+                <View className="flex-1 justify-center items-center pt-20">
+                    {/* Backdrop */}
+                    <TouchableOpacity
+                        onPress={() => setShowModal(false)}
+                        className="absolute inset-0 bg-black/50"
+                        activeOpacity={1}
+                    />
+
+                    {/* Dialog */}
+                    <View className="w-[92%] max-w-[360px] bg-white rounded-2xl p-5 gap-1" style={{ minHeight: 400 }}>
+                        <View className="flex-row items-center justify-between mb-4">
+                            <Text className="text-xl font-bold text-gray-900">Request a day off</Text>
                             <TouchableOpacity
                                 onPress={() => setShowModal(false)}
-                                className="w-8 h-8 rounded-full bg-gray-100 items-center justify-center"
+                                className="w-9 h-9 rounded-xl bg-gray-100 items-center justify-center"
                             >
                                 <Text className="text-gray-600 font-bold text-lg">×</Text>
                             </TouchableOpacity>
                         </View>
 
-                        {/* Content */}
-                        <View className="p-6">
-                            {/* Select Period */}
-                            <View className="mb-6">
-                                <Text className="text-base font-poppins-medium text-gray-700 mb-3">Select Period</Text>
-                                <TouchableOpacity
-                                    onPress={() => setShowStartDatePicker(true)}
-                                    className="flex-row items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200"
-                                >
-                                    <Text className="font-poppins-medium text-gray-900">
-                                        {formatDateRange()}
-                                    </Text>
-                                    <ArrowRight2 size={16} color="#6B7280" variant="Outline" style={{ transform: [{ rotate: '90deg' }] }} />
-                                </TouchableOpacity>
-                            </View>
+                        {/* Select Period */}
+                        <Text className="text-sm text-gray-800 mb-2">Select Period</Text>
+                        <TouchableOpacity
+                            onPress={openCalendarModal}
+                            className="flex-row items-center justify-between p-4 bg-gray-50 rounded-xl border border-containerGray mb-4"
+                        >
+                            <Text className="font-poppins-medium text-gray-900">
+                                {formatDateRange()}
+                            </Text>
+                            <ArrowRight2 size={16} color="#6B7280" variant="Outline" style={{ transform: [{ rotate: '90deg' }] }} />
+                        </TouchableOpacity>
 
-                            {/* Reason */}
-                            <View className="mb-6">
-                                <Text className="text-base font-poppins-medium text-gray-700 mb-3">Reason</Text>
-                                <TextInput
-                                    value={reason}
-                                    onChangeText={setReason}
-                                    placeholder="Enter your reason for time off..."
-                                    placeholderTextColor="#9CA3AF"
-                                    multiline
-                                    numberOfLines={4}
-                                    className="p-4 bg-gray-50 rounded-xl border border-gray-200 font-poppins-regular text-gray-900"
-                                    textAlignVertical="top"
-                                    style={{ minHeight: 120 }}
-                                />
-                            </View>
-                        </View>
+                        {/* Reason */}
+                        <Text className="text-sm text-gray-800 mb-2">Reason</Text>
+                        <TextInput
+                            value={reason}
+                            onChangeText={setReason}
+                            placeholder="Enter your reason for time off..."
+                            placeholderTextColor="#9CA3AF"
+                            multiline
+                            numberOfLines={50}
+                            style={{ height: 250 }}
+                            textAlignVertical="top"
+                            className="h-40 rounded-xl border border-containerGray px-4 py-3 mb-4"
+                        />
 
-                        {/* Action Buttons */}
-                        <View className="p-6 border-t border-gray-100">
-                            <View className="flex-row gap-3">
-                                <Button
-                                    title="Cancel"
-                                    onPress={() => setShowModal(false)}
-                                    variant="transparent"
-                                    className="flex-1 bg-white border border-gray-300"
-                                    textClassName="text-gray-700 font-poppins-semibold text-base"
-                                />
-                                <Button
-                                    title="Confirm"
-                                    onPress={handleSubmit}
-                                    variant="primary"
-                                    className="flex-1 bg-[#8CC044]"
-                                    textClassName="text-white font-poppins-semibold text-base"
-                                />
-                            </View>
+                        <View className="flex-row items-center justify-between mt-6 gap-3">
+                            {/* Cancel Button */}
+                            <TouchableOpacity
+                                onPress={() => setShowModal(false)}
+                                activeOpacity={0.9}
+                                className="flex-1 py-3 rounded-xl bg-white  border-gray-300 items-center justify-center"
+                            >
+                                <Text className="text-lg font-semibold text-black">Cancel</Text>
+                            </TouchableOpacity>
+
+                            {/* Confirm Button */}
+                            <TouchableOpacity
+                                onPress={handleSubmit}
+                                activeOpacity={0.9}
+                                className="flex-1 py-3 rounded-xl bg-[#8CC044] items-center justify-center"
+                            >
+                                <Text className="text-white font-semibold text-lg">Confirm</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>
 
-                {/* Date Pickers */}
-                {showStartDatePicker && (
-                    <DateTimePicker
-                        value={startDate}
-                        mode="date"
-                        display="default"
-                        onChange={handleStartDateChange}
-                        minimumDate={new Date()}
-                    />
-                )}
 
-                {showEndDatePicker && (
-                    <DateTimePicker
-                        value={endDate}
-                        mode="date"
-                        display="default"
-                        onChange={handleEndDateChange}
-                        minimumDate={startDate}
+
+            </Modal>
+
+            {/* Calendar Modal for Date Range Selection */}
+            <Modal
+                visible={showCalendarModal}
+                transparent
+                animationType="fade"
+                statusBarTranslucent
+                presentationStyle="overFullScreen"
+                onRequestClose={() => setShowCalendarModal(false)}
+            >
+                <View className="flex-1 justify-center items-center pt-20">
+                    {/* Backdrop */}
+                    <TouchableOpacity
+                        onPress={() => setShowCalendarModal(false)}
+                        className="absolute inset-0 bg-black/50"
+                        activeOpacity={1}
                     />
-                )}
+
+                    {/* Calendar Dialog */}
+                    <View className="w-[92%] max-w-[360px] bg-white rounded-2xl p-5">
+                        <View className="flex-row items-center justify-between mb-4">
+                            <Text className="text-xl font-bold text-gray-900">
+                                {isSelectingEndDate ? 'Select End Date' : 'Select Start Date'}
+                            </Text>
+                            <TouchableOpacity
+                                onPress={() => setShowCalendarModal(false)}
+                                className="w-9 h-9 rounded-xl bg-gray-100 items-center justify-center"
+                            >
+                                <Text className="text-gray-600 font-bold text-lg">×</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        <Calendar
+                            theme={{
+                                backgroundColor: '#ffffff',
+                                calendarBackground: '#ffffff',
+                                textSectionTitleColor: '#000000',
+                                selectedDayBackgroundColor: '#8CC044',
+                                selectedDayTextColor: '#ffffff',
+                                todayTextColor: '#8CC044',
+                                dayTextColor: '#000000',
+                                textDisabledColor: '#d9e1e8',
+                                dotColor: '#8CC044',
+                                selectedDotColor: '#ffffff',
+                                arrowColor: '#8CC044',
+                                monthTextColor: '#000000',
+                                indicatorColor: '#8CC044',
+                                textDayFontFamily: 'Poppins-Regular',
+                                textMonthFontFamily: 'Poppins-Bold',
+                                textDayHeaderFontFamily: 'Poppins-Regular',
+                                textDayFontSize: 16,
+                                textMonthFontSize: 18,
+                                textDayHeaderFontSize: 14,
+                            }}
+                            onDayPress={handleCalendarDayPress}
+                            markedDates={selectedDates}
+                            enableSwipeMonths={true}
+                            markingType="period"
+                        />
+
+                        {isSelectingEndDate && (
+                            <View className="mt-4">
+                                <Text className="text-sm text-gray-600 text-center mb-3">
+                                    Now select the end date for your time off period
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                </View>
             </Modal>
         </View>
     );
