@@ -10,3 +10,4 @@ export {default as StartTodayModal} from './StartTodayModal';
 export {default as PhotoUpload} from './PhotoUpload';
 export {default as BoxComponent} from './BoxComponent';
 export {default as FilePicker} from './FilePicker';
+export {default as PayrollCard} from './PayrollCard';
