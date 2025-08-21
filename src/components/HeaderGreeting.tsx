@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { IMAGES } from '../constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { COLORS } from '../constants';
+import { useAuthStore } from '../stores/authStore';
 
 type Props = {
     name: string;
@@ -12,10 +13,10 @@ type Props = {
 };
 
 const HeaderGreeting: React.FC<Props> = ({
-    name,
     subtitle = 'Hello, Welcome 👋',
     onBellPress,
 }) => {
+    const { user } = useAuthStore();
     return (
         <View className="flex-row items-center justify-between mt-2">
             <View className="flex-row items-center gap-3">
@@ -28,7 +29,7 @@ const HeaderGreeting: React.FC<Props> = ({
                 />
                 <View >
                     <Text className="text-gray text-sm font-poppins-regular">{subtitle}</Text>
-                    <Text className="text-lg font-poppins-bold">{name}</Text>
+                    <Text className="text-lg font-poppins-bold">{user?.username}</Text>
                 </View>
             </View>
 

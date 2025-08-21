@@ -13,14 +13,16 @@ import {
 import { useAuthStore } from '../stores/authStore';
 import { COLORS, IMAGES } from '../constants';
 import InputField from '../components/InputField';
+import LoadingOverlay from '../components/LoadingOverlay';
 
 interface LoginScreenProps {
     navigation: any;
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
-    const [email, setEmail] = useState('driver@gmail.com');
+    const [email, setEmail] = useState('driver1@wp.com');
     const [password, setPassword] = useState('password');
+    const [showSuccessLoader, setShowSuccessLoader] = useState(false);
     const { login, isLoading } = useAuthStore();
 
     const handleLogin = async () => {
@@ -29,17 +31,36 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             return;
         }
 
-        const success = await login(email, password);
-        if (success) {
-            navigation.replace('MainApp');
-        } else {
-            Alert.alert('Error', 'Invalid email or password');
+        try {
+            console.log('Attempting login with:', { email, password });
+            const success = await login(email, password);
+            if (success) {
+                console.log('Login successful, showing success loader');
+                setShowSuccessLoader(true);
+                
+                // Show loader for 2 seconds then navigate
+                setTimeout(() => {
+                    setShowSuccessLoader(false);
+                    navigation.replace('MainApp');
+                }, 2000);
+            }
+        } catch (error: any) {
+            console.error('Login error:', error);
+            // Show error as alert - the error message comes from the auth store
+            Alert.alert('Login Error', error.message || 'An error occurred during login');
         }
     };
+
+
 
     return (
         <View className="flex-1">
             <StatusBar barStyle="light-content" backgroundColor={COLORS.primaryGreen} />
+            
+            {/* Success Loader Overlay */}
+            {showSuccessLoader && (
+                <LoadingOverlay message="Login successful! Loading your dashboard..." />
+            )}
 
             <View className="absolute inset-0">
                 {/* Top green area (fixed height) */}
@@ -123,6 +144,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                                     <Text className="text-white font-semibold text-lg">Sign In</Text>
                                 )}
                             </TouchableOpacity>
+
+
                         </View>
                     </View>
                 </ScrollView>

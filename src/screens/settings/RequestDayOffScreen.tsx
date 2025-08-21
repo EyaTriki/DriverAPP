@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert, TextInput, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ArrowRight2 } from 'iconsax-react-native';
@@ -7,38 +7,20 @@ import { Button } from '../../components';
 import { Calendar } from 'react-native-calendars';
 import SegmentTabs, { TabKey } from '../../components/SegmentTabs';
 import TippingCard, { TippingItem } from '../../components/TippingCard';
+import { 
+    useDayOffStore, 
+    DayOffRequest, 
+    validateDayOffRequest, 
+    formatDateRange, 
+    getStatusColor, 
+    getStatusText 
+} from '../../stores/dayOffStore';
 
 const TABS = [
     { key: 'approved' as const, label: 'Approved' },
     { key: 'pending' as const, label: 'Pending' },
     { key: 'rejected' as const, label: 'Rejected' },
     { key: 'all' as const, label: 'All' },
-];
-
-const MOCK_REQUESTS: TippingItem[] = [
-    {
-        id: '1',
-        status: 'approved',
-        requestLabel: 'Request: August 19, 2025 - August 25, 2025',
-        approvedOn: 'Approved on July 19, 2025',
-        subline: 'Family vacation and personal time off',
-        proofUploaded: false
-    },
-    {
-        id: '2',
-        status: 'approved',
-        requestLabel: 'Request: September 5, 2025 - September 7, 2025',
-        approvedOn: 'Approved on August 15, 2025',
-        subline: 'Medical appointment and recovery',
-        proofUploaded: false
-    },
-    {
-        id: '3',
-        status: 'pending',
-        requestLabel: 'Request: October 10, 2025 - October 12, 2025',
-        subline: 'Personal family event',
-        proofUploaded: false
-    },
 ];
 
 const RequestDayOffScreen: React.FC = () => {
@@ -53,10 +35,50 @@ const RequestDayOffScreen: React.FC = () => {
     const [selectedDates, setSelectedDates] = useState<{ [key: string]: any }>({});
     const [isSelectingEndDate, setIsSelectingEndDate] = useState(false);
 
+    // Day off store
+    const { 
+        requests, 
+        isLoading, 
+        error, 
+        fetchDayOffRequests, 
+        createDayOffRequest, 
+        clearError 
+    } = useDayOffStore();
+
+    // Fetch day off requests on component mount
+    useEffect(() => {
+        fetchDayOffRequests();
+    }, []);
+
+    // Convert day off requests to TippingItem format
+    const convertToTippingItems = (dayOffRequests: DayOffRequest[]): TippingItem[] => {
+        return dayOffRequests.map(request => ({
+            id: request._id,
+            status: request.status.toLowerCase() as 'approved' | 'pending' | 'rejected',
+            requestLabel: `Request: ${formatDateRange(request.startDate, request.endDate)}`,
+            approvedOn: request.status === 'Approved' 
+                ? `Approved on ${new Date(request.updatedAt).toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}`
+                : request.status === 'Rejected'
+                ? `Rejected on ${new Date(request.updatedAt).toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}`
+                : 'Pending approval',
+            subline: request.reason,
+            proofUploaded: false
+        }));
+    };
+
     const data = useMemo(() => {
-        if (tab === 'all') return MOCK_REQUESTS;
-        return MOCK_REQUESTS.filter(it => it.status === tab);
-    }, [tab]);
+        const tippingItems = convertToTippingItems(requests);
+        if (tab === 'all') return tippingItems;
+        return tippingItems.filter(it => it.status === tab);
+    }, [requests, tab]);
 
 
 
@@ -124,7 +146,7 @@ const RequestDayOffScreen: React.FC = () => {
         }
     };
 
-    const formatDateRange = () => {
+    const formatSelectedDateRange = () => {
         const start = startDate.toLocaleDateString('en-US', {
             day: '2-digit',
             month: 'short',
@@ -144,27 +166,47 @@ const RequestDayOffScreen: React.FC = () => {
         return diffDays;
     };
 
-    const handleSubmit = () => {
-        if (!reason.trim()) {
-            Alert.alert('Missing Information', 'Please provide a reason for your time off request.');
-            return;
-        }
-
-        if (startDate > endDate) {
-            Alert.alert('Invalid Dates', 'Start date cannot be after end date.');
-            return;
-        }
-
-        Alert.alert(
-            'Request Submitted',
-            `Your time off request for ${calculateDaysOff()} day(s) has been submitted successfully.`,
-            [
-                {
-                    text: 'OK',
-                    onPress: () => setShowModal(false)
-                }
-            ]
+    const handleSubmit = async () => {
+        // Validate the request
+        const validationError = validateDayOffRequest(
+            startDate.toISOString().split('T')[0],
+            endDate.toISOString().split('T')[0],
+            reason
         );
+
+        if (validationError) {
+            Alert.alert('Validation Error', validationError);
+            return;
+        }
+
+        try {
+            const success = await createDayOffRequest({
+                startDate: startDate.toISOString().split('T')[0],
+                endDate: endDate.toISOString().split('T')[0],
+                reason: reason.trim()
+            });
+
+            if (success) {
+                Alert.alert(
+                    'Request Submitted',
+                    `Your time off request for ${calculateDaysOff()} day(s) has been submitted successfully.`,
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => {
+                                setShowModal(false);
+                                setReason('');
+                                setStartDate(new Date());
+                                setEndDate(new Date());
+                                setSelectedDates({});
+                            }
+                        }
+                    ]
+                );
+            }
+        } catch (error: any) {
+            Alert.alert('Error', error.message || 'Failed to submit request');
+        }
     };
 
 
@@ -172,7 +214,7 @@ const RequestDayOffScreen: React.FC = () => {
     return (
         <View className="flex-1 bg-backgroundScreen">
             {/* Header */}
-            <View className="pt-12 pb-8 px-5 bg-gray-800">
+            <View className="pt-12 pb-8 px-5">
                 <View className="flex-row items-center">
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}
@@ -180,7 +222,7 @@ const RequestDayOffScreen: React.FC = () => {
                     >
                         <ArrowRight2 size={20} color="#FFFFFF" variant="Outline" style={{ transform: [{ rotate: '180deg' }] }} />
                     </TouchableOpacity>
-                    <Text className="text-xl font-bold text-black">My Requests</Text>
+                    <Text className="text-xl font-bold text-gray-900">My Requests</Text>
                 </View>
             </View>
 
@@ -189,18 +231,46 @@ const RequestDayOffScreen: React.FC = () => {
                 {/* Tabs */}
                 <SegmentTabs value={tab} onChange={setTab} items={TABS} />
 
-                {/* Add New Request Button */}
-                <Button
-                    title="Add New Request"
-                    onPress={() => setShowModal(true)}
-                    variant="black"
-                    className="rounded-[10px] px-4 py-[10px] mt-5 self-end"
-                    textClassName="text-white font-poppins-semibold text-base"
-                />
+                            {/* Add New Request Button */}
+            <Button
+                title="Add New Request"
+                onPress={() => setShowModal(true)}
+                variant="black"
+                className="rounded-[10px] px-4 py-[10px] mt-5 self-end"
+                textClassName="text-white font-poppins-semibold text-base"
+            />
 
-                {/* Requests List */}
-                <View className="mt-5">
-                    {data.map(item => (
+            {/* Error Display */}
+            {error && (
+                <View className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <Text className="text-red-600 text-sm">{error}</Text>
+                    <TouchableOpacity onPress={clearError} className="mt-2">
+                        <Text className="text-red-500 text-xs">Dismiss</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+
+            {/* Loading State */}
+            {isLoading && (
+                <View className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <Text className="text-gray-600 text-center">Loading requests...</Text>
+                </View>
+            )}
+
+            {/* Requests List */}
+            <View className="mt-5">
+                {data.length === 0 && !isLoading ? (
+                    <View className="p-8 bg-gray-50 rounded-lg">
+                        <Text className="text-gray-500 text-center text-lg">No requests found</Text>
+                        <Text className="text-gray-400 text-center text-sm mt-2">
+                            {tab === 'all' 
+                                ? 'You haven\'t made any day off requests yet.'
+                                : `No ${tab} requests found.`
+                            }
+                        </Text>
+                    </View>
+                ) : (
+                    data.map(item => (
                         <TippingCard
                             key={item.id}
                             item={{
@@ -211,8 +281,9 @@ const RequestDayOffScreen: React.FC = () => {
                                 },
                             }}
                         />
-                    ))}
-                </View>
+                    ))
+                )}
+            </View>
             </ScrollView>
 
             {/* Request Modal */}
@@ -251,7 +322,7 @@ const RequestDayOffScreen: React.FC = () => {
                             className="flex-row items-center justify-between p-4 bg-gray-50 rounded-xl border border-containerGray mb-4"
                         >
                             <Text className="font-poppins-medium text-gray-900">
-                                {formatDateRange()}
+                                {formatSelectedDateRange()}
                             </Text>
                             <ArrowRight2 size={16} color="#6B7280" variant="Outline" style={{ transform: [{ rotate: '90deg' }] }} />
                         </TouchableOpacity>
@@ -284,9 +355,14 @@ const RequestDayOffScreen: React.FC = () => {
                             <TouchableOpacity
                                 onPress={handleSubmit}
                                 activeOpacity={0.9}
-                                className="flex-1 py-3 rounded-xl bg-[#8CC044] items-center justify-center"
+                                disabled={isLoading}
+                                className={`flex-1 py-3 rounded-xl items-center justify-center ${
+                                    isLoading ? 'bg-gray-400' : 'bg-[#8CC044]'
+                                }`}
                             >
-                                <Text className="text-white font-semibold text-lg">Confirm</Text>
+                                <Text className="text-white font-semibold text-lg">
+                                    {isLoading ? 'Submitting...' : 'Confirm'}
+                                </Text>
                             </TouchableOpacity>
                         </View>
                     </View>

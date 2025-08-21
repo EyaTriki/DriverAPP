@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ArrowRight2 } from 'iconsax-react-native';
 import { useAuthStore } from '../../stores/authStore';
@@ -7,13 +7,36 @@ import { InputField, Button } from '../../components';
 
 const PersonalInformationScreen: React.FC = () => {
     const navigation = useNavigation<any>();
-    const { user } = useAuthStore();
-    const [name, setName] = useState(user?.name || 'John Doe');
-    const [email, setEmail] = useState(user?.email || 'JohnDoe20@gmail.com');
+    const { user, updateProfile, isLoading } = useAuthStore();
+    const [name, setName] = useState(user?.username || '');
+    const [email, setEmail] = useState(user?.email || '');
 
-    const handleConfirm = () => {
-        // Here you would typically update the user data
-        navigation.goBack();
+    const handleConfirm = async () => {
+        if (!name || !email) {
+            Alert.alert('Error', 'Please fill in all fields');
+            return;
+        }
+
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            Alert.alert('Error', 'Please enter a valid email address');
+            return;
+        }
+
+        try {
+            const success = await updateProfile({ 
+                username: name,
+                email: email 
+            });
+            if (success) {
+                Alert.alert('Success', 'Personal information updated successfully', [
+                    { text: 'OK', onPress: () => navigation.goBack() }
+                ]);
+            }
+        } catch (error: any) {
+            Alert.alert('Update Error', error.message || 'Failed to update personal information');
+        }
     };
 
     return (
@@ -67,11 +90,12 @@ const PersonalInformationScreen: React.FC = () => {
 
                         />
                         <Button
-                            title="Confirm"
+                            title={isLoading ? "Updating..." : "Confirm"}
                             onPress={handleConfirm}
                             variant="primary"
                             className="flex-1 ml-2 "
                             textClassName="text-white font-poppins-semibold text-base"
+                            disabled={isLoading}
                         />
                     </View>
                 </View>

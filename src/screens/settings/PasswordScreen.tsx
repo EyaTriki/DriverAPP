@@ -1,17 +1,42 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ArrowRight2 } from 'iconsax-react-native';
 import { InputField, Button } from '../../components';
+import { useAuthStore } from '../../stores/authStore';
 
 const PasswordScreen: React.FC = () => {
     const navigation = useNavigation<any>();
+    const { updateProfile, isLoading } = useAuthStore();
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    const handleConfirm = () => {
-        // Here you would typically update the password
-        navigation.goBack();
+    const handleConfirm = async () => {
+        if (!newPassword || !confirmPassword) {
+            Alert.alert('Error', 'Please fill in all fields');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            Alert.alert('Error', 'Passwords do not match');
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            Alert.alert('Error', 'Password must be at least 6 characters long');
+            return;
+        }
+
+        try {
+            const success = await updateProfile({ password: newPassword });
+            if (success) {
+                Alert.alert('Success', 'Password updated successfully', [
+                    { text: 'OK', onPress: () => navigation.goBack() }
+                ]);
+            }
+        } catch (error: any) {
+            Alert.alert('Update Error', error.message || 'Failed to update password');
+        }
     };
 
     return (
@@ -64,11 +89,12 @@ const PasswordScreen: React.FC = () => {
                             textClassName="text-black font-poppins-semibold text-base"
                         />
                         <Button
-                            title="Confirm"
+                            title={isLoading ? "Updating..." : "Confirm"}
                             onPress={handleConfirm}
                             variant="primary"
                             className="flex-1 ml-2"
                             textClassName="text-white font-poppins-semibold text-base"
+                            disabled={isLoading}
                         />
                     </View>
                 </View>

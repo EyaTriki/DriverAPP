@@ -71,7 +71,7 @@ const SettingsScreen: React.FC = () => {
                                 {/* inner avatar container */}
                                 <View className="w-20 h-20 rounded-full overflow-hidden bg-gray-200">
                                     <Image
-                                        source={profileImage ? { uri: profileImage } : IMAGES.avatarPlaceholder}
+                                        source={user?.picture  ? { uri: user?.picture } : IMAGES.avatarPlaceholder}
                                         className="w-full h-full"
                                         resizeMode="cover"
                                     />
@@ -88,7 +88,7 @@ const SettingsScreen: React.FC = () => {
                         </View>
 
                         <Text className="mt-4 text-lg font-poppins-bold text-gray-900">
-                            {user?.name || 'John Doe'}
+                            {user?.username || 'John Doe'}
                         </Text>
                         <Text className="mt-1 font-poppins-regular text-lg text-gray-500">
                             {user?.email || 'Johndoe20@gmail.com'}
