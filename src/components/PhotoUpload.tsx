@@ -27,7 +27,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
                     onPress={onUpload}
                     className="items-center justify-center"
                 >
-                    <MaterialIcons name="drive-folder-upload" size={48} color="#8CC044" />
+                    <MaterialIcons name="add-photo-alternate" size={48} color="#8CC044" />
                     <Text className=" font-poppins-medium mt-2">Upload Photo</Text>
                 </TouchableOpacity>
                 <View className="flex-row space-x-3 mt-3">

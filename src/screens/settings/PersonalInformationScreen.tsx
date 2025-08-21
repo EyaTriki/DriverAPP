@@ -25,9 +25,9 @@ const PersonalInformationScreen: React.FC = () => {
         }
 
         try {
-            const success = await updateProfile({ 
+            const success = await updateProfile({
                 username: name,
-                email: email 
+                email: email
             });
             if (success) {
                 Alert.alert('Success', 'Personal information updated successfully', [
