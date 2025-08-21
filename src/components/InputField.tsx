@@ -123,7 +123,7 @@ const InputField: React.FC<InputFieldProps> = ({
                 )}
 
                 <TextInput
-                    className={`flex-1 py-4 text-gray-900 text-base ${multiline ? 'text-top' : ''}`}
+                    className={`flex-1 py-4 text-black text-base ${multiline ? 'text-top' : ''}`}
                     placeholder={placeholder}
                     placeholderTextColor="#999999"
                     value={value}

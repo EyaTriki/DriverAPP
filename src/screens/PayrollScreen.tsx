@@ -195,7 +195,7 @@ const PayrollScreen: React.FC<PayrollScreenProps> = () => {
         setEndDate(now);
     };
 
-    const handleApplyFilter = () => {
+    const handleFilterApply = (selectedDates: any) => {
         setShowFilterModal(false);
         // Filter is automatically applied through useMemo
         console.log('Filter applied:', { selectedPeriod, selectedDates });
@@ -364,7 +364,7 @@ const PayrollScreen: React.FC<PayrollScreenProps> = () => {
             </ScrollView>
 
             {/* Filter Modal */}
-            <Modal
+            <FilterModal
                 visible={showFilterModal}
                 transparent
                 animationType="slide"
