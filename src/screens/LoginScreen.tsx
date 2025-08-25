@@ -37,7 +37,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             if (success) {
                 console.log('Login successful, showing success loader');
                 setShowSuccessLoader(true);
-                
+
                 // Show loader for 2 seconds then navigate
                 setTimeout(() => {
                     setShowSuccessLoader(false);
@@ -45,6 +45,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 }, 2000);
             }
         } catch (error: any) {
+            console.log('Login error:', error);
             console.error('Login error:', error);
             // Show error as alert - the error message comes from the auth store
             Alert.alert('Login Error', error.message || 'An error occurred during login');
@@ -56,7 +57,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     return (
         <View className="flex-1">
             <StatusBar barStyle="light-content" backgroundColor={COLORS.primaryGreen} />
-            
+
             {/* Success Loader Overlay */}
             {showSuccessLoader && (
                 <LoadingOverlay message="Login successful! Loading your dashboard..." />
@@ -73,8 +74,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
 
             <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                className="absolute inset-0"
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                className="flex-1"
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+                style={{ flex: 1 }}
             >
                 <ScrollView
                     className="flex-1"
@@ -83,8 +86,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                     contentContainerStyle={{
                         flexGrow: 1,
                         justifyContent: 'flex-start',
-                        paddingTop: 80 // Décalage vers le haut
+                        paddingTop: 80,
+                        paddingBottom: 190, // Increased bottom padding for better keyboard handling
+                        minHeight: '100%'
                     }}
+                    showsVerticalScrollIndicator={false}
+                    bounces={false}
                 >
                     <View className="px-6">
                         {/* Header Section - In green area */}
@@ -93,7 +100,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                             <View className="mb-8 mt-5">
                                 <Image
                                     source={IMAGES.logoWhite}
-                                    className="w-50 h-50"
+                                    className="w-33 h-32"
                                     resizeMode="contain"
                                 />
                             </View>
@@ -108,7 +115,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                         </View>
 
                         {/* Form Container - Overlapping both sections */}
-                        <View className="bg-white rounded-3xl p-8 shadow-2xl">
+                        <View className="bg-white rounded-3xl p-8 shadow-2xl mb-8">
                             {/* Email Input */}
                             <InputField
                                 label="Email"

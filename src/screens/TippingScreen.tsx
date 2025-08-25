@@ -51,9 +51,7 @@ const TippingScreen: React.FC = () => {
       <View className="p-5">
         {/* Header */}
         <HeaderGreeting
-          name="John Doe"
           subtitle="Hello, Welcome 👋"
-          onBellPress={() => { }}
         />
 
         {/* Title */}

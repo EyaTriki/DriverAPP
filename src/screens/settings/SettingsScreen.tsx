@@ -1,4 +1,3 @@
-// screens/SettingsScreen.tsx
 import React, { useState } from 'react';
 import { View, Text, Alert, ScrollView, Image, Platform, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -6,19 +5,18 @@ import { useAuthStore } from '../../stores/authStore';
 import { User, Wallet, LogoutCurve, Camera, Calendar as Today } from 'iconsax-react-native';
 import { IMAGES } from '../../constants/images';
 import { BoxComponent } from '../../components';
-import { FilePicker } from '../../components';
-import { FilePickerResult } from '../../components/FilePicker';
+import { FilePickerResult, takePrivatePhoto } from '../../components/FilePicker';
 
 
 const SettingsScreen: React.FC = () => {
     const { user, logout } = useAuthStore();
     const navigation = useNavigation<any>();
-    const [profileImage, setProfileImage] = useState<string | null>(null);
+    const [_profileImage, setProfileImage] = useState<string | null>(null);
 
 
     const handleCameraPress = async () => {
         try {
-            const result: FilePickerResult | null = await FilePicker.takePhoto({
+            const result: FilePickerResult | null = await takePrivatePhoto({
                 mediaType: 'photo',
                 maxHeight: 2000,
                 maxWidth: 2000,
@@ -43,7 +41,8 @@ const SettingsScreen: React.FC = () => {
                 onPress: async () => {
                     try {
                         await logout();
-                        navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+                        // Navigate to Splash which will handle the routing based on auth state
+                        navigation.reset({ index: 0, routes: [{ name: 'Splash' }] });
                     } catch (e) {
                         console.error(e);
                         Alert.alert('Erreur', 'Une erreur est survenue lors de la déconnexion.');
@@ -71,7 +70,7 @@ const SettingsScreen: React.FC = () => {
                                 {/* inner avatar container */}
                                 <View className="w-20 h-20 rounded-full overflow-hidden bg-gray-200">
                                     <Image
-                                        source={user?.picture  ? { uri: user?.picture } : IMAGES.avatarPlaceholder}
+                                        source={user?.picture ? { uri: user?.picture } : IMAGES.avatarPlaceholder}
                                         className="w-full h-full"
                                         resizeMode="cover"
                                     />
@@ -88,10 +87,10 @@ const SettingsScreen: React.FC = () => {
                         </View>
 
                         <Text className="mt-4 text-lg font-poppins-bold text-gray-900">
-                            {user?.username || 'John Doe'}
+                            {user?.username}
                         </Text>
                         <Text className="mt-1 font-poppins-regular text-lg text-gray-500">
-                            {user?.email || 'Johndoe20@gmail.com'}
+                            {user?.email}
                         </Text>
                     </View>
                 </View>
@@ -121,6 +120,7 @@ const SettingsScreen: React.FC = () => {
                         textClass="font-poppins-medium text-base"
 
                     />
+
 
                     {/* Logout (danger) */}
                     <BoxComponent

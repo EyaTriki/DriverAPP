@@ -120,6 +120,28 @@ export async function takePrivatePhoto(
 }
 
 /** Helpers */
+export function getFileExtension(mimeType?: string): string {
+    if (!mimeType) return 'bin';
+    const parts = mimeType.split('/');
+    if (parts.length !== 2) return 'bin';
+    
+    const extension = parts[1].toLowerCase();
+    // Map common MIME types to file extensions
+    const mimeToExt: { [key: string]: string } = {
+        'jpeg': 'jpg',
+        'jpg': 'jpg',
+        'png': 'png',
+        'gif': 'gif',
+        'webp': 'webp',
+        'pdf': 'pdf',
+        'doc': 'doc',
+        'docx': 'docx',
+        'txt': 'txt',
+    };
+    
+    return mimeToExt[extension] || extension;
+}
+
 export function formatFileSize(bytes?: number): string {
     if (!bytes) return '0 B';
     const sizes = ['B', 'KB', 'MB', 'GB'];

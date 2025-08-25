@@ -33,8 +33,12 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string/>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>This app records audio messages.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to camera to take photos for proof of storage operations.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to photo library to select photos for proof of storage operations.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app needs access to photo library to save photos for proof of storage operations.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -55,6 +59,7 @@
 		<string>Poppins-Medium.ttf</string>
 		<string>Poppins-Regular.ttf</string>
 		<string>Poppins-SemiBold.ttf</string>
+		<string>Ionicons.ttf</string>
 	</array>
 </dict>
 </plist>

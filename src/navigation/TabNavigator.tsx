@@ -9,7 +9,7 @@ import { COLORS } from '../constants';
 // Screens
 import DashboardScreen from '../screens/DashboardScreen';
 import ChatScreen from '../screens/ChatScreen';
-import StorageScreen from '../screens/StorageScreen';
+import StorageScreen from '../screens/storage/StorageScreen';
 import TippingScreen from '../screens/TippingScreen';
 import SettingsNavigator from './SettingsNavigator';
 
