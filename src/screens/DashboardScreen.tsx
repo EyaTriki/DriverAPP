@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import HeaderGreeting from '../components/HeaderGreeting';
 import ActionPill from '../components/ActionPill';
 import JobCard from '../components/JobCard';
@@ -12,6 +13,7 @@ import { COLORS } from '../constants/colors';
 
 
 const DashboardScreen: React.FC = () => {
+  const navigation = useNavigation<any>();
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [isPickupModalVisible, setIsPickupModalVisible] = useState(false);
   const [isStartTodayModalVisible, setIsStartTodayModalVisible] = useState(false);
@@ -62,9 +64,7 @@ const DashboardScreen: React.FC = () => {
       {/* Header + buttons area (keeps page padding) */}
       <View className="px-6 pt-6">
         <HeaderGreeting
-          name="John Doe"
           subtitle="Hello, Welcome 👋"
-          onBellPress={() => { }}
         />
 
         <Text className="text-xl font-poppins-semibold mt-8">Job Lists</Text>

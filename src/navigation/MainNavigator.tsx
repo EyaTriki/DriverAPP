@@ -5,13 +5,16 @@ import SplashScreen from '../screens/SplashScreen';
 import LoginScreen from '../screens/LoginScreen';
 import TabNavigator from './TabNavigator';
 import ChatScreen from '../screens/ChatScreen';
+import NotificationsScreen from '../screens/NotificationsScreen';
+import AddItemsScreen from '../screens/storage/AddItemsScreen';
+import RemoveItemsScreen from '../screens/storage/RemoveItemsScreen';
 import { useAuthStore } from '../stores/authStore';
 import { ActivityIndicator, View } from 'react-native';
 
 const Stack = createStackNavigator();
 
 const MainNavigator = () => {
-    const { isLoading, checkAuthStatus } = useAuthStore();
+    const { isLoading, isAuthenticated, checkAuthStatus } = useAuthStore();
 
     useEffect(() => {
         checkAuthStatus();
@@ -25,10 +28,18 @@ const MainNavigator = () => {
         );
     }
 
+    // Determine initial route based on authentication status
+    const getInitialRouteName = () => {
+        if (isAuthenticated) {
+            return 'MainApp';
+        }
+        return 'Splash';
+    };
+
     return (
         <NavigationContainer>
             <Stack.Navigator
-                initialRouteName="Splash"
+                initialRouteName={getInitialRouteName()}
                 screenOptions={{
                     headerShown: false,
                     gestureEnabled: false,
@@ -58,6 +69,30 @@ const MainNavigator = () => {
                 <Stack.Screen
                     name="Chat"
                     component={ChatScreen}
+                    options={{
+                        headerShown: false,
+                        gestureEnabled: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="Notifications"
+                    component={NotificationsScreen}
+                    options={{
+                        headerShown: false,
+                        gestureEnabled: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="AddItems"
+                    component={AddItemsScreen}
+                    options={{
+                        headerShown: false,
+                        gestureEnabled: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="RemoveItems"
+                    component={RemoveItemsScreen}
                     options={{
                         headerShown: false,
                         gestureEnabled: true,

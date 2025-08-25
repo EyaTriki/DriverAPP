@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 // API Configuration
-const API_BASE_URL = 'http://192.168.100.5:3000';
+const API_BASE_URL = 'http://192.168.100.2:3000';
 
 interface User {
   id: string;
@@ -101,17 +101,23 @@ export const useAuthStore = create<AuthStore>()(
         try {
           set({isLoading: true});
 
+          console.log('Making request to:', `${API_BASE_URL}/api/sign-in`);
+          console.log('Request payload:', {email, password});
+
           // Call the backend API directly
-          const response = await axios.post(`${API_BASE_URL}/api/driver-sign-in`, {
+          const response = await axios.post(`${API_BASE_URL}/api/sign-in`, {
             email,
-            password
+            password,
           });
+
+          console.log('Response status:', response.status);
+          console.log('Response data:', response.data);
 
           const data = response.data;
 
           if (data.success) {
             set({
-              user: data.driver,
+              user: data.user,
               token: data.token,
               refreshToken: data.refreshToken,
               isAuthenticated: true,
@@ -124,11 +130,19 @@ export const useAuthStore = create<AuthStore>()(
           return false;
         } catch (error: any) {
           set({isLoading: false});
-          
+
+          console.log('Error details:', {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+          });
+
           // Handle different types of errors
           if (error.response) {
             // Server responded with error status
-            const errorMessage = error.response.data.message || 'Authentication failed';
+            const errorMessage =
+              error.response.data.message || 'Authentication failed';
             throw new Error(errorMessage);
           } else if (error.request) {
             // Network error
@@ -180,7 +194,9 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      updateProfile: async (profileData: UpdateProfileData): Promise<boolean> => {
+      updateProfile: async (
+        profileData: UpdateProfileData,
+      ): Promise<boolean> => {
         try {
           set({isLoading: true});
 
@@ -191,10 +207,15 @@ export const useAuthStore = create<AuthStore>()(
 
           // Create FormData for file uploads
           const formData = new FormData();
-          
+
           // Add text fields
           Object.keys(profileData).forEach(key => {
-            if (key !== 'picture' && key !== 'DriverLicense' && key !== 'addressProof' && key !== 'NatInsurance') {
+            if (
+              key !== 'picture' &&
+              key !== 'DriverLicense' &&
+              key !== 'addressProof' &&
+              key !== 'NatInsurance'
+            ) {
               const value = profileData[key as keyof UpdateProfileData];
               if (value !== undefined) {
                 formData.append(key, value as string);
@@ -222,10 +243,10 @@ export const useAuthStore = create<AuthStore>()(
             formData,
             {
               headers: {
-                'Authorization': `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
                 'Content-Type': 'multipart/form-data',
               },
-            }
+            },
           );
 
           if (response.data.message) {
@@ -247,11 +268,12 @@ export const useAuthStore = create<AuthStore>()(
           return false;
         } catch (error: any) {
           set({isLoading: false});
-          
+
           // Handle different types of errors
           if (error.response) {
             // Server responded with error status
-            const errorMessage = error.response.data.message || 'Failed to update profile';
+            const errorMessage =
+              error.response.data.message || 'Failed to update profile';
             throw new Error(errorMessage);
           } else if (error.request) {
             // Network error

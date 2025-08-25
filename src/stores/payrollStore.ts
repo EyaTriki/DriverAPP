@@ -1,13 +1,13 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import {create} from 'zustand';
+import {persist, createJSONStorage} from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 // Import auth store
-import { useAuthStore } from './authStore';
+import {useAuthStore} from './authStore';
 
 // API Base URL
-const API_BASE_URL = 'http://192.168.100.5:3000';   
+const API_BASE_URL = 'http://192.168.100.2:3000';
 
 // Types
 export interface PayrollRecord {
@@ -34,10 +34,10 @@ interface PayrollState {
 interface PayrollActions {
   // Fetch all payroll records for the current user
   fetchPayrollRecords: () => Promise<boolean>;
-  
+
   // Clear error
   clearError: () => void;
-  
+
   // Reset store
   reset: () => void;
 }
@@ -60,19 +60,19 @@ export const usePayrollStore = create<PayrollStore>()(
 
       fetchPayrollRecords: async (): Promise<boolean> => {
         try {
-          set({ isLoading: true, error: null });
-          
+          set({isLoading: true, error: null});
+
           // Get token from auth store
           const authStore = useAuthStore.getState();
           const token = authStore.token;
-          
+
           if (!token) {
             throw new Error('No authentication token found');
           }
 
           const response = await axios.get(`${API_BASE_URL}/api/payroll`, {
             headers: {
-              'Authorization': `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
           });
 
@@ -84,21 +84,24 @@ export const usePayrollStore = create<PayrollStore>()(
             });
             return true;
           }
-          
-          set({ isLoading: false });
+
+          set({isLoading: false});
           return false;
         } catch (error: any) {
           console.error('Error fetching payroll records:', error);
           set({
             isLoading: false,
-            error: error.response?.data?.message || error.message || 'Failed to fetch payroll records',
+            error:
+              error.response?.data?.message ||
+              error.message ||
+              'Failed to fetch payroll records',
           });
           return false;
         }
       },
 
       clearError: () => {
-        set({ error: null });
+        set({error: null});
       },
 
       reset: () => {
@@ -108,11 +111,11 @@ export const usePayrollStore = create<PayrollStore>()(
     {
       name: 'payroll-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({
+      partialize: state => ({
         records: state.records,
       }),
-    }
-  )
+    },
+  ),
 );
 
 // Helper functions
@@ -135,7 +138,9 @@ export const formatDate = (dateString: string | undefined | null): string => {
   }
 };
 
-export const formatDateTime = (dateString: string | undefined | null): string => {
+export const formatDateTime = (
+  dateString: string | undefined | null,
+): string => {
   if (!dateString) {
     return 'Invalid Date';
   }
@@ -226,7 +231,11 @@ export const calculateTotalHours = (records: PayrollRecord[]): number => {
 };
 
 // Get records for a specific month
-export const getRecordsForMonth = (records: PayrollRecord[], year: number, month: number): PayrollRecord[] => {
+export const getRecordsForMonth = (
+  records: PayrollRecord[],
+  year: number,
+  month: number,
+): PayrollRecord[] => {
   if (!records || records.length === 0) {
     return [];
   }
@@ -239,7 +248,9 @@ export const getRecordsForMonth = (records: PayrollRecord[], year: number, month
       if (isNaN(recordDate.getTime())) {
         return false;
       }
-      return recordDate.getFullYear() === year && recordDate.getMonth() === month;
+      return (
+        recordDate.getFullYear() === year && recordDate.getMonth() === month
+      );
     } catch (error) {
       return false;
     }
